@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Alignment - Workflow Editor</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Toolbar -->
+      <div id="toolbar">
+        <div class="toolbar-section">
+          <h1 class="app-title">AI Alignment</h1>
+        </div>
+
+        <div class="toolbar-section toolbar-center">
+          <button id="add-node-btn" class="toolbar-btn">
+            <span class="icon">+</span>
+            ノード追加
+          </button>
+
+          <div id="add-node-menu" class="dropdown-menu hidden">
+            <div class="menu-item" data-node-type="user-input">
+              ユーザー入力
+            </div>
+            <div class="menu-item" data-node-type="brave-search">
+              Brave Search
+            </div>
+            <div class="menu-item" data-node-type="openai">OpenAI</div>
+            <div class="menu-item" data-node-type="grok">Grok</div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-node-type="custom">
+              カスタムノード...
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar-section toolbar-actions">
+          <label class="toggle-label">
+            <input type="checkbox" id="auto-execute-toggle" />
+            <span>自動実行</span>
+          </label>
+
+          <button id="execute-btn" class="toolbar-btn primary">
+            <span class="icon">▶</span>
+            実行
+          </button>
+
+          <div class="divider"></div>
+
+          <button id="save-btn" class="toolbar-btn">
+            <span class="icon">💾</span>
+            保存
+          </button>
+
+          <button id="load-btn" class="toolbar-btn">
+            <span class="icon">📂</span>
+            読込
+          </button>
+
+          <button id="settings-btn" class="toolbar-btn">
+            <span class="icon">⚙</span>
+            設定
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div id="main-content">
+        <!-- Canvas for node editor -->
+        <div id="canvas-container">
+          <canvas id="canvas"></canvas>
+          <div id="nodes-layer"></div>
+        </div>
+
+        <!-- Sidebar for node properties -->
+        <div id="sidebar" class="hidden">
+          <div class="sidebar-header">
+            <h2>プロパティ</h2>
+            <button id="sidebar-close" class="close-btn">×</button>
+          </div>
+          <div id="sidebar-content">
+            <!-- Dynamic content based on selected node -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>設定</h2>
+          <button class="close-btn" onclick="closeSettingsModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-section">
+            <h3>API キー</h3>
+
+            <div class="setting-item">
+              <label>Brave Search API Key</label>
+              <input
+                type="password"
+                id="brave-api-key"
+                placeholder="APIキーを入力"
+              />
+              <button onclick="saveApiKey('brave-search')">保存</button>
+            </div>
+
+            <div class="setting-item">
+              <label>OpenAI API Key</label>
+              <input
+                type="password"
+                id="openai-api-key"
+                placeholder="APIキーを入力"
+              />
+              <button onclick="saveApiKey('openai')">保存</button>
+            </div>
+
+            <div class="setting-item">
+              <label>Grok API Key</label>
+              <input
+                type="password"
+                id="grok-api-key"
+                placeholder="APIキーを入力"
+              />
+              <button onclick="saveApiKey('grok')">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="hidden">
+      <div class="spinner"></div>
+      <p>実行中...</p>
+    </div>
+
+    <script src="src/core/Node.js"></script>
+    <script src="src/core/Connection.js"></script>
+    <script src="src/core/NodeRegistry.js"></script>
+    <script src="src/core/WorkflowEngine.js"></script>
+
+    <script src="src/nodes/UserInputNode.js"></script>
+    <script src="src/nodes/BraveSearchNode.js"></script>
+    <script src="src/nodes/OpenAINode.js"></script>
+    <script src="src/nodes/GrokNode.js"></script>
+
+    <script src="src/ui/Canvas.js"></script>
+    <script src="src/ui/NodeRenderer.js"></script>
+    <script src="src/ui/ConnectionRenderer.js"></script>
+    <script src="src/ui/Toolbar.js"></script>
+
+    <script src="src/settings/ApiKeyManager.js"></script>
+    <script src="src/workflow/WorkflowManager.js"></script>
+    <script src="src/plugins/PluginLoader.js"></script>
+
+    <script src="src/renderer.js"></script>
+  </body>
+</html>
