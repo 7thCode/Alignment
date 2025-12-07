@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Alignment - Workflow Editor</title>
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/model-store.css" />
   </head>
   <body>
     <div id="app">
@@ -29,6 +30,7 @@
             </div>
             <div class="menu-item" data-node-type="openai">OpenAI</div>
             <div class="menu-item" data-node-type="grok">Grok</div>
+            <div class="menu-item" data-node-type="local-llm">ローカルLLM</div>
             <div class="menu-item" data-node-type="display">結果表示</div>
             <div class="menu-divider"></div>
             <div class="menu-item" data-node-type="custom">
@@ -96,37 +98,68 @@
           <button class="close-btn" onclick="closeSettingsModal()">×</button>
         </div>
         <div class="modal-body">
-          <div class="settings-section">
-            <h3>API キー</h3>
+          <!-- Settings Tabs -->
+          <div class="settings-tabs">
+            <button class="settings-tab-btn active" data-tab="api-keys">API Keys</button>
+            <button class="settings-tab-btn" data-tab="models">Models</button>
+          </div>
 
-            <div class="setting-item">
-              <label>Brave Search API Key</label>
-              <input
-                type="password"
-                id="brave-api-key"
-                placeholder="APIキーを入力"
-              />
-              <button onclick="saveApiKey('brave-search')">保存</button>
+          <!-- Tab Content -->
+          <div class="settings-tab-content">
+            <!-- API Keys Tab -->
+            <div id="api-keys-tab" class="settings-tab active">
+              <div class="settings-section">
+                <h3>API キー</h3>
+
+                <div class="setting-item">
+                  <label>Brave Search API Key</label>
+                  <input
+                    type="password"
+                    id="brave-api-key"
+                    placeholder="APIキーを入力"
+                  />
+                  <button onclick="saveApiKey('brave-search')">保存</button>
+                </div>
+
+                <div class="setting-item">
+                  <label>OpenAI API Key</label>
+                  <input
+                    type="password"
+                    id="openai-api-key"
+                    placeholder="APIキーを入力"
+                  />
+                  <button onclick="saveApiKey('openai')">保存</button>
+                </div>
+
+                <div class="setting-item">
+                  <label>Grok API Key</label>
+                  <input
+                    type="password"
+                    id="grok-api-key"
+                    placeholder="APIキーを入力"
+                  />
+                  <button onclick="saveApiKey('grok')">保存</button>
+                </div>
+              </div>
             </div>
 
-            <div class="setting-item">
-              <label>OpenAI API Key</label>
-              <input
-                type="password"
-                id="openai-api-key"
-                placeholder="APIキーを入力"
-              />
-              <button onclick="saveApiKey('openai')">保存</button>
-            </div>
-
-            <div class="setting-item">
-              <label>Grok API Key</label>
-              <input
-                type="password"
-                id="grok-api-key"
-                placeholder="APIキーを入力"
-              />
-              <button onclick="saveApiKey('grok')">保存</button>
+            <!-- Models Tab -->
+            <div id="models-tab" class="settings-tab">
+              <!-- Model Store Tabs -->
+              <div class="model-store-tabs">
+                <button class="tab-btn active" data-tab="presets">
+                  プリセット
+                </button>
+                <button class="tab-btn" data-tab="installed">
+                  インストール済み
+                </button>
+              </div>
+              
+              <!-- Tab Content -->
+              <div class="tab-content">
+                <div id="presetsTab" class="tab-pane active"></div>
+                <div id="installedTab" class="tab-pane"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -170,6 +203,7 @@
     <script src="src/nodes/BraveSearchNode.js"></script>
     <script src="src/nodes/OpenAINode.js"></script>
     <script src="src/nodes/GrokNode.js"></script>
+    <script src="src/nodes/LocalLLMNode.js"></script>
     <script src="src/nodes/DisplayNode.js"></script>
 
     <script src="src/ui/Canvas.js"></script>
@@ -177,6 +211,7 @@
     <script src="src/ui/ConnectionRenderer.js"></script>
     <script src="src/ui/Toolbar.js"></script>
 
+    <script src="src/settings/ModelStoreUI.js"></script>
     <script src="src/settings/ApiKeyManager.js"></script>
     <script src="src/workflow/WorkflowManager.js"></script>
     <script src="src/plugins/PluginLoader.js"></script>

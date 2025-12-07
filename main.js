@@ -2,8 +2,21 @@ const { app, BrowserWindow, ipcMain, safeStorage, dialog } = require('electron')
 const path = require('path');
 const fs = require('fs').promises;
 
+// Model management imports
+const ModelManager = require('./src/backend/model-manager');
+const LlamaManager = require('./src/backend/llama-manager');
+const ModelDownloader = require('./src/backend/model-downloader');
+const IPCHandlersModels = require('./src/backend/ipc-handlers-models');
+const { MODELS_DIR, SETTINGS_PATH, DEFAULT_SETTINGS } = require('./src/shared/constants');
+
 let mainWindow;
 let API_KEYS_FILE = null;
+
+// Model management instances
+let modelManager;
+let llamaManager;
+let modelDownloader;
+let ipcHandlersModels;
 
 function getApiKeysFile() {
   if (!API_KEYS_FILE) {
@@ -36,8 +49,45 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
+async function initializeModelManagement() {
+  try {
+    // Load settings to get custom models directory if set
+    let settings = { ...DEFAULT_SETTINGS };
+    try {
+      const data = await fs.readFile(SETTINGS_PATH, 'utf-8');
+      settings = { ...settings, ...JSON.parse(data) };
+    } catch {
+      // Settings file doesn't exist yet, use defaults
+    }
+
+    const modelsDir = settings.modelsDirectory || MODELS_DIR;
+
+    // Initialize managers
+    modelManager = new ModelManager(modelsDir);
+    llamaManager = new LlamaManager();
+    modelDownloader = new ModelDownloader(mainWindow, modelsDir);
+
+    // Initialize models directory
+    await modelManager.initialize();
+
+    // Register IPC handlers
+    ipcHandlersModels = new IPCHandlersModels(
+      mainWindow,
+      modelManager,
+      modelDownloader,
+      llamaManager
+    );
+    ipcHandlersModels.registerAll();
+
+    console.log('Model management initialized');
+  } catch (error) {
+    console.error('Failed to initialize model management:', error);
+  }
+}
+
+app.whenReady().then(async () => {
   createWindow();
+  await initializeModelManagement();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

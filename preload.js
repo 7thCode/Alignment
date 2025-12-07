@@ -10,5 +10,36 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Workflow File Management
   saveWorkflow: (workflowData) => ipcRenderer.invoke('save-workflow-dialog', workflowData),
-  loadWorkflow: () => ipcRenderer.invoke('load-workflow-dialog')
+  loadWorkflow: () => ipcRenderer.invoke('load-workflow-dialog'),
+
+  // Model Management
+  modelList: () => ipcRenderer.invoke('model:list'),
+  modelPresets: () => ipcRenderer.invoke('model:presets'),
+  modelAdd: () => ipcRenderer.invoke('model:add'),
+  modelDelete: (modelId) => ipcRenderer.invoke('model:delete', modelId),
+  modelDownload: (modelConfig) => ipcRenderer.invoke('model:download', modelConfig),
+  modelCancelDownload: (downloadId) => ipcRenderer.invoke('model:cancelDownload', downloadId),
+  modelLoad: (modelPath) => ipcRenderer.invoke('model:load', modelPath),
+  modelUnload: () => ipcRenderer.invoke('model:unload'),
+  modelCurrent: () => ipcRenderer.invoke('model:current'),
+  modelPrompt: (prompt, options) => ipcRenderer.invoke('model:prompt', { prompt, options }),
+  
+  // Model Directory Management
+  modelsDirSelect: () => ipcRenderer.invoke('modelsDir:select'),
+  modelsDirGet: () => ipcRenderer.invoke('modelsDir:get'),
+  modelsDirSet: (dirPath) => ipcRenderer.invoke('modelsDir:set', dirPath),
+
+  // Event listeners for model operations
+  onDownloadProgress: (callback) => {
+    ipcRenderer.on('download:progress', (event, data) => callback(data));
+  },
+  onDownloadComplete: (callback) => {
+    ipcRenderer.on('download:complete', (event, data) => callback(data));
+  },
+  onDownloadError: (callback) => {
+    ipcRenderer.on('download:error', (event, data) => callback(data));
+  },
+  onModelLoadStatus: (callback) => {
+    ipcRenderer.on('model:loadStatus', (event, data) => callback(data));
+  }
 });

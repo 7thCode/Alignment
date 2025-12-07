@@ -10,7 +10,7 @@ class NodeRenderer {
     this.nodeElements = new Map();
   }
 
-  createNodeElement(node) {
+  async createNodeElement(node) {
     const nodeEl = document.createElement('div');
     nodeEl.className = 'node';
     nodeEl.id = `node-${node.id}`;
@@ -115,8 +115,10 @@ class NodeRenderer {
       body.appendChild(portsDiv);
     }
     
-    // Parameters
-    const paramDefs = node.getParameterDefinitions();
+    // Parameters - await if async
+    const paramDefsResult = node.getParameterDefinitions();
+    const paramDefs = paramDefsResult instanceof Promise ? await paramDefsResult : paramDefsResult;
+    
     if (paramDefs && paramDefs.length > 0) {
       paramDefs.forEach((paramDef) => {
         const paramDiv = this.createParameterInput(node, paramDef);
@@ -166,7 +168,7 @@ class NodeRenderer {
     nodeEl.appendChild(header);
     nodeEl.appendChild(body);
     
-    // Click to select
+    // Make node selectable
     nodeEl.addEventListener('click', (e) => {
       if (e.target === nodeEl || e.target.closest('.node-header')) {
         if (this.onNodeSelect) {
@@ -256,13 +258,13 @@ class NodeRenderer {
     document.addEventListener('mouseup', handleMouseUp);
   }
 
-  renderNode(node) {
+  async renderNode(node) {
     if (this.nodeElements.has(node.id)) {
       this.updateNode(node);
       return;
     }
     
-    const nodeEl = this.createNodeElement(node);
+    const nodeEl = await this.createNodeElement(node);
     this.nodesLayer.appendChild(nodeEl);
     this.nodeElements.set(node.id, nodeEl);
   }
