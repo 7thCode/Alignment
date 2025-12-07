@@ -45,7 +45,7 @@ function initApp() {
     handlePortClick
   );
   
-  connectionRenderer = new ConnectionRenderer(canvas, nodeRenderer);
+  connectionRenderer = new ConnectionRenderer(canvas, nodeRenderer, handleConnectionDelete);
   
   toolbar = new Toolbar({
     onAddNode: handleAddNode,
@@ -156,6 +156,19 @@ function handlePortClick(nodeId, port, direction, x, y) {
   }
 }
 
+function handleConnectionDelete(connectionId) {
+  // Remove from workflow engine
+  workflowEngine.removeConnection(connectionId);
+  
+  // Remove from renderer
+  connectionRenderer.removeConnection(connectionId);
+  
+  // Re-render
+  connectionRenderer.render();
+  
+  console.log(`Deleted connection: ${connectionId}`);
+}
+
 async function handleExecute() {
   console.log('Executing workflow...');
   
@@ -183,7 +196,6 @@ async function handleExecute() {
     
     if (success) {
       console.log('Workflow executed successfully');
-      alert('ワークフローの実行が完了しました');
     } else {
       console.error('Workflow execution failed');
     }
@@ -216,19 +228,19 @@ function handleSettings() {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-  // Delete selected node
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    if (selectedNodeId) {
-      const node = workflowEngine.nodes.get(selectedNodeId);
-      if (node) {
-        workflowEngine.removeNode(selectedNodeId);
-        nodeRenderer.removeNode(selectedNodeId);
-        selectedNodeId = null;
-        connectionRenderer.render();
-        console.log(`Deleted node: ${selectedNodeId}`);
-      }
-    }
-  }
+  // Delete key disabled - use delete button on node instead
+  // if (e.key === 'Delete' || e.key === 'Backspace') {
+  //   if (selectedNodeId) {
+  //     const node = workflowEngine.nodes.get(selectedNodeId);
+  //     if (node) {
+  //       workflowEngine.removeNode(selectedNodeId);
+  //       nodeRenderer.removeNode(selectedNodeId);
+  //       selectedNodeId = null;
+  //       connectionRenderer.render();
+  //       console.log(`Deleted node: ${selectedNodeId}`);
+  //     }
+  //   }
+  // }
   
   // Escape to cancel connection
   if (e.key === 'Escape') {

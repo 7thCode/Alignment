@@ -29,8 +29,47 @@ class NodeRenderer {
     status.className = 'node-status';
     status.id = `status-${node.id}`;
     
+    // Delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'node-delete-btn';
+    deleteBtn.innerHTML = '×';
+    deleteBtn.title = 'ノードを削除';
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(`ノード "${node.getDisplayName()}" を削除しますか？`)) {
+        const connectionRenderer = window.connectionRenderer;
+        const workflowEngine = window.workflowEngine;
+        
+        // Find and remove all connections related to this node
+        const connectionsToRemove = [];
+        connectionRenderer.connections.forEach((connData, connId) => {
+          if (connData.connection.from.nodeId === node.id || 
+              connData.connection.to.nodeId === node.id) {
+            connectionsToRemove.push(connId);
+          }
+        });
+        
+        // Remove connections from ConnectionRenderer
+        connectionsToRemove.forEach(connId => {
+          connectionRenderer.removeConnection(connId);
+        });
+        
+        // Remove from workflow engine (this also removes connections)
+        workflowEngine.removeNode(node.id);
+        
+        // Remove node from renderer
+        this.removeNode(node.id);
+        
+        // Re-render remaining connections
+        connectionRenderer.render();
+        
+        console.log(`Deleted node: ${node.id} and ${connectionsToRemove.length} related connections`);
+      }
+    });
+    
     header.appendChild(title);
     header.appendChild(status);
+    header.appendChild(deleteBtn);
     
     // Make header draggable
     header.addEventListener('mousedown', (e) => this.handleDragStart(e, node, nodeEl));
@@ -58,7 +97,10 @@ class NodeRenderer {
           e.stopPropagation();
           if (this.onPortClick) {
             const rect = port.getBoundingClientRect();
-            this.onPortClick(node.id, inputName, 'input', rect.left, rect.top + rect.height / 2);
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+            const x = rect.left - canvasRect.left;
+            const y = rect.top + rect.height / 2 - canvasRect.top;
+            this.onPortClick(node.id, inputName, 'input', x, y);
           }
         });
         
@@ -106,7 +148,10 @@ class NodeRenderer {
           e.stopPropagation();
           if (this.onPortClick) {
             const rect = port.getBoundingClientRect();
-            this.onPortClick(node.id, outputName, 'output', rect.right, rect.top + rect.height / 2);
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+            const x = rect.right - canvasRect.left;
+            const y = rect.top + rect.height / 2 - canvasRect.top;
+            this.onPortClick(node.id, outputName, 'output', x, y);
           }
         });
         

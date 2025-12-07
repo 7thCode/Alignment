@@ -1,0 +1,14 @@
+{
+  "editor.formatOnSave": false,
+  "files.associations": {
+    "*.js": "javascript"
+  },
+  "files.exclude": {
+    "node_modules": true,
+    "dist": true
+  },
+  "search.exclude": {
+    "node_modules": true,
+    "dist": true
+  }
+}

@@ -3,7 +3,14 @@ const path = require('path');
 const fs = require('fs').promises;
 
 let mainWindow;
-const API_KEYS_FILE = path.join(app.getPath('userData'), 'api-keys.json');
+let API_KEYS_FILE = null;
+
+function getApiKeysFile() {
+  if (!API_KEYS_FILE) {
+    API_KEYS_FILE = path.join(app.getPath('userData'), 'api-keys.json');
+  }
+  return API_KEYS_FILE;
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -50,7 +57,7 @@ ipcMain.handle('save-api-key', async (event, service, apiKey) => {
     // Load existing keys
     let keys = {};
     try {
-      const data = await fs.readFile(API_KEYS_FILE, 'utf-8');
+      const data = await fs.readFile(getApiKeysFile(), 'utf-8');
       keys = JSON.parse(data);
     } catch (err) {
       // File doesn't exist yet, that's ok
@@ -65,7 +72,7 @@ ipcMain.handle('save-api-key', async (event, service, apiKey) => {
     }
 
     // Save to file
-    await fs.writeFile(API_KEYS_FILE, JSON.stringify(keys, null, 2));
+    await fs.writeFile(getApiKeysFile(), JSON.stringify(keys, null, 2));
     return { success: true };
   } catch (error) {
     console.error('Error saving API key:', error);
@@ -75,7 +82,7 @@ ipcMain.handle('save-api-key', async (event, service, apiKey) => {
 
 ipcMain.handle('get-api-key', async (event, service) => {
   try {
-    const data = await fs.readFile(API_KEYS_FILE, 'utf-8');
+    const data = await fs.readFile(getApiKeysFile(), 'utf-8');
     const keys = JSON.parse(data);
     
     if (keys[service] && safeStorage.isEncryptionAvailable()) {
@@ -93,12 +100,12 @@ ipcMain.handle('get-api-key', async (event, service) => {
 
 ipcMain.handle('delete-api-key', async (event, service) => {
   try {
-    const data = await fs.readFile(API_KEYS_FILE, 'utf-8');
+    const data = await fs.readFile(getApiKeysFile(), 'utf-8');
     const keys = JSON.parse(data);
     
     delete keys[service];
     
-    await fs.writeFile(API_KEYS_FILE, JSON.stringify(keys, null, 2));
+    await fs.writeFile(getApiKeysFile(), JSON.stringify(keys, null, 2));
     return { success: true };
   } catch (error) {
     console.error('Error deleting API key:', error);

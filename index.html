@@ -29,6 +29,7 @@
             </div>
             <div class="menu-item" data-node-type="openai">OpenAI</div>
             <div class="menu-item" data-node-type="grok">Grok</div>
+            <div class="menu-item" data-node-type="display">結果表示</div>
             <div class="menu-divider"></div>
             <div class="menu-item" data-node-type="custom">
               カスタムノード...
@@ -138,6 +139,28 @@
       <p>実行中...</p>
     </div>
 
+    <!-- Result Display Modal -->
+    <div id="result-modal" class="modal hidden">
+      <div class="modal-content result-modal-content">
+        <div class="modal-header">
+          <h2>📊 実行結果</h2>
+          <button class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="result-content" class="result-content"></div>
+        </div>
+        <div class="modal-footer">
+          <span id="result-timestamp" class="result-timestamp hidden"></span>
+          <div class="result-actions">
+            <button id="result-copy-btn" class="toolbar-btn">
+              <span class="icon">📋</span>
+              コピー
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="src/core/Node.js"></script>
     <script src="src/core/Connection.js"></script>
     <script src="src/core/NodeRegistry.js"></script>
@@ -147,6 +170,7 @@
     <script src="src/nodes/BraveSearchNode.js"></script>
     <script src="src/nodes/OpenAINode.js"></script>
     <script src="src/nodes/GrokNode.js"></script>
+    <script src="src/nodes/DisplayNode.js"></script>
 
     <script src="src/ui/Canvas.js"></script>
     <script src="src/ui/NodeRenderer.js"></script>
@@ -157,6 +181,7 @@
     <script src="src/workflow/WorkflowManager.js"></script>
     <script src="src/plugins/PluginLoader.js"></script>
 
+    <script src="src/ui/ResultModal.js"></script>
     <script src="src/renderer.js"></script>
   </body>
 </html>
