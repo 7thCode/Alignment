@@ -47,6 +47,9 @@ function initApp() {
   
   connectionRenderer = new ConnectionRenderer(canvas, nodeRenderer, handleConnectionDelete);
   
+  // Make connectionRenderer globally accessible (after creation)
+  window.connectionRenderer = connectionRenderer;
+  
   toolbar = new Toolbar({
     onAddNode: handleAddNode,
     onExecute: handleExecute,
@@ -219,7 +222,41 @@ async function handleSave() {
 
 async function handleLoad() {
   await workflowManager.loadWorkflow();
+  resetIdCounters();
   connectionRenderer.render();
+}
+
+function resetIdCounters() {
+  let maxNodeId = 0;
+  let maxConnectionId = 0;
+  
+  // Get maximum node ID from loaded nodes
+  workflowEngine.nodes.forEach((node) => {
+    const match = node.id.match(/node-(\d+)/);
+    if (match) {
+      const id = parseInt(match[1], 10);
+      if (id > maxNodeId) {
+        maxNodeId = id;
+      }
+    }
+  });
+  
+  // Get maximum connection ID from loaded connections
+  workflowEngine.connections.forEach((connection) => {
+    const match = connection.id.match(/conn-(\d+)/);
+    if (match) {
+      const id = parseInt(match[1], 10);
+      if (id > maxConnectionId) {
+        maxConnectionId = id;
+      }
+    }
+  });
+  
+  // Update counters (next ID should be max + 1)
+  nextNodeId = maxNodeId + 1;
+  nextConnectionId = maxConnectionId + 1;
+  
+  console.log(`Reset ID counters - nextNodeId: ${nextNodeId}, nextConnectionId: ${nextConnectionId}`);
 }
 
 function handleSettings() {
